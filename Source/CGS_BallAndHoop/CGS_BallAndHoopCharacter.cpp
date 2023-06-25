@@ -7,6 +7,9 @@
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Engine/World.h"
+#include "Grabber.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,6 +38,10 @@ ACGS_BallAndHoopCharacter::ACGS_BallAndHoopCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	Grabber = CreateDefaultSubobject<UGrabber>(TEXT("Grabber Component"));
+	Grabber->SetupAttachment(FirstPersonCameraComponent);
+
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Physics Handle Component"));
 }
 
 void ACGS_BallAndHoopCharacter::BeginPlay()
@@ -53,6 +60,12 @@ void ACGS_BallAndHoopCharacter::BeginPlay()
 
 }
 
+void ACGS_BallAndHoopCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	Grabber->Player = this;
+}
+
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ACGS_BallAndHoopCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -69,6 +82,8 @@ void ACGS_BallAndHoopCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACGS_BallAndHoopCharacter::Look);
+	
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ACGS_BallAndHoopCharacter::Interact);
 	}
 }
 
@@ -96,6 +111,19 @@ void ACGS_BallAndHoopCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ACGS_BallAndHoopCharacter::Interact(const FInputActionValue& Value)
+{
+	bool bIsPressed = Value.Get<bool>();
+	if (bIsPressed)
+	{
+		Grabber->Grab();
+	}
+	else
+	{
+		Grabber->Release();
 	}
 }
 

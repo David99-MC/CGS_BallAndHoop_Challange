@@ -13,6 +13,8 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
+class UGrabber;
+class UPhysicsHandleComponent;
 
 UCLASS(config=Game)
 class ACGS_BallAndHoopCharacter : public ACharacter
@@ -39,12 +41,18 @@ class ACGS_BallAndHoopCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* InteractAction;
+
 	
 public:
 	ACGS_BallAndHoopCharacter();
 
 protected:
 	virtual void BeginPlay();
+
+	virtual void PostInitializeComponents() override;
 
 public:
 		
@@ -64,12 +72,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetHasRifle();
 
+	UPROPERTY(VisibleAnywhere)
+	UGrabber* Grabber;
+
+	UPROPERTY(VisibleAnywhere)
+	UPhysicsHandleComponent* PhysicsHandle;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void Interact(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
