@@ -49,8 +49,6 @@ void UGrabber::Grab()
 {
 	FVector Start = GetComponentLocation();
 	FVector End = Start + GetForwardVector() * GrabDistance;
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-	DrawDebugSphere(GetWorld(), End, GrabRadius, 12, FColor::Green);
 
 	FHitResult HitResult; // Out parameter
 	bool bHasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(GrabRadius));
